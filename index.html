@@ -31,16 +31,19 @@ button.n{font:600 17px ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px;
 const API_URL = 'https://script.google.com/macros/s/AKfycbzVgwWDoXCJhFJVVGA9Z2OpjI5cHNu_pSLkTcb_ooVZ6wvPeWV2PZapORrWImEOK_fN/exec';
 // =====================================================
 const $=id=>document.getElementById(id);
-let list=[];
+let list=[],err='';
 function draw(){const t=$('q').value.trim(),g=$('g');g.innerHTML='';let c=0;
  list.forEach(n=>{if(t&&!n.includes(t))return;c++;const b=document.createElement('button');b.className='n';b.textContent=n;
-  b.onclick=()=>{$('mn').textContent=n;$('mi').src='img/'+n+'.jpg';$('m').classList.add('on')};g.appendChild(b)});
- $('e').hidden=c>0||!list.length;$('cnt').textContent='ကျန် '+list.length+' ရွက်'}
+  b.onclick=()=>{$('mn').textContent=n;const im=$('mi');im.onerror=()=>{im.onerror=null;im.src='img/'+n+'.jpg'};im.src=n+'.jpg';$('m').classList.add('on')};g.appendChild(b)});
+ $('e').hidden=c>0||!list.length;$('cnt').textContent=err||('ကျန် '+list.length+' ရွက်')}
 async function load(){
- try{const r=await fetch(API_URL);const d=await r.json();list=d.numbers||[];
+ if(API_URL.indexOf('ဒီမှာ')>=0||API_URL.indexOf('http')!==0){err='API_URL မထည့်ရသေးပါ (index.html ထဲမှာ Web App URL ထည့်ပါ)';draw();return}
+ try{const r=await fetch(API_URL);if(!r.ok)throw new Error('HTTP '+r.status);
+  const d=await r.json();if(!d||!Array.isArray(d.numbers))throw new Error('Sheet က မမျှော်လင့်တဲ့ အဖြေပြန်လာတယ်');
+  list=d.numbers;err=list.length?'':'Sheet ထဲမှာ ပြစရာနံပါတ် မရှိပါ';
   try{localStorage.setItem('cache',JSON.stringify(list))}catch(e){}}
- catch(e){try{list=JSON.parse(localStorage.getItem('cache')||'[]')}catch(x){}
-  if(!list.length)$('cnt').textContent='ဖတ်မရပါ - API_URL ကို စစ်ပါ'}
+ catch(e){err='ဖတ်မရပါ: '+e.message+' (Web App ကို Who has access: Anyone နဲ့ deploy လုပ်ထားလား စစ်ပါ)';
+  try{const c=JSON.parse(localStorage.getItem('cache')||'[]');if(c.length){list=c;err=''}}catch(x){}}
  draw()}
 $('q').oninput=draw;$('m').onclick=()=>$('m').classList.remove('on');
 try{list=JSON.parse(localStorage.getItem('cache')||'[]');draw()}catch(e){}
