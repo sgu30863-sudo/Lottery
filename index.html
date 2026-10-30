@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="my"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ထီနံပါတ်များ</title>
+<style>
+:root{--paper:#fff4f8;--ink:#2a1a23;--pink:#d4217c;--pink2:#a8155f;--band:#ffe66b;--bandink:#1f1a1c;--mut:#7d6572;--line:#f2c7da;--card:#fff}
+@media (prefers-color-scheme: dark){:root{--paper:#1a1317;--ink:#f8e9f1;--pink:#ff6fb0;--pink2:#ff8fc2;--mut:#c4a8b7;--line:#46303c;--card:#251a21}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Myanmar","Myanmar Text",sans-serif;line-height:1.5;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+header{background:linear-gradient(135deg,#d4217c,#8e1a63);color:#fff;padding:max(22px,env(safe-area-inset-top)) 16px 26px;position:relative;overflow:hidden;border-radius:0 0 28px 28px}
+header::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(ellipse at 20% 120%,rgba(255,255,255,.16) 0 1px,transparent 1px 7px)}
+.hd{position:relative;max-width:860px;margin:0 auto}
+h1{margin:0;font-size:26px;font-weight:800;line-height:1.3}
+.draw{margin:6px 0 14px;font-size:15px;opacity:.95}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:5px 12px;border-radius:99px;font-size:14px}
+.pill b{font-size:16px}
+main{max-width:860px;margin:0 auto;padding:16px}
+.sw{position:relative}
+.sw svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;stroke:var(--mut);fill:none;stroke-width:2}
+#q{width:100%;padding:14px 14px 14px 44px;font-size:17px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink)}
+#q:focus{outline:none;border-color:var(--pink)}
+.row{display:flex;gap:8px;align-items:center;margin:12px 0}
+.chips{display:flex;gap:6px;overflow-x:auto;flex:1;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-width:38px;padding:7px 11px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;font:600 15px ui-monospace,Menlo,Consolas,monospace;cursor:pointer}
+.chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.seg{flex:none;display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--card);color:var(--mut);padding:8px 12px;font-size:14px;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--paper)}
+#msg{font-size:14px;color:var(--mut);margin:4px 2px 12px;min-height:21px}
+#msg.err{color:#c62828;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.t{position:relative;border:0;cursor:pointer;background:var(--band);color:var(--bandink);padding:14px 10px 10px;border-radius:10px;text-align:center;font:800 21px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-indent:.12em;box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.t::before,.t::after{content:"";position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--paper);transform:translateY(-50%)}
+.t::before{left:-6px}.t::after{right:-6px}
+.t small{display:block;font:600 11px system-ui;letter-spacing:0;text-indent:0;opacity:.6;margin-top:2px}
+.t:active{transform:scale(.97)}
+.g{padding:0;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;color:var(--ink);text-align:center}
+.g img{display:block;width:100%;aspect-ratio:1.82;object-fit:cover;background:#f3d9e5}
+.g span{display:block;padding:8px 4px;font:800 17px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em}
+.empty{text-align:center;color:var(--mut);padding:36px 0}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+#m{position:fixed;inset:0;background:rgba(20,8,14,.86);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+#m.on{display:flex;animation:f .15s ease-out}
+@keyframes f{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#m.on{animation:none}}
+#mb{width:100%;max-width:820px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+#mn{background:var(--band);color:var(--bandink);padding:6px 16px;border-radius:8px;font:800 22px ui-monospace,Menlo,monospace;letter-spacing:.14em}
+.ib{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:99px;min-width:44px;height:44px;font-size:22px;cursor:pointer;padding:0 14px}
+#mi{display:block;width:100%;border-radius:12px;background:#fff}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.nav .ib{font-size:26px}
+#cp{font-size:16px;background:var(--pink);font-weight:600}
+#pos{color:#e8d3de;font-size:14px;text-align:center;flex:1}
+</style></head><body>
+<header><div class="hd">
+<h1>ထီနံပါတ်များ</h1>
+<p class="draw">ထီပွင့်မယ့်ရက် ၁ နိုဝင်ဘာ ၂၀၂၆</p>
+<div class="pills"><span class="pill" id="days"></span><span class="pill" id="left"></span></div>
+</div></header>
+<main>
+<div class="sw"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+<input id="q" inputmode="numeric" placeholder="နံပါတ်ရှာပါ (ဥပမာ 0138)" aria-label="နံပါတ်ရှာရန်"></div>
+<div class="row"><div class="chips" id="chips" aria-label="ရှေ့ဂဏန်းနဲ့ စစ်ရန်"></div>
+<div class="seg"><button id="v1" class="on">နံပါတ်</button><button id="v2">ပုံ</button></div></div>
+<div id="msg">ဖတ်နေသည်…</div>
+<div class="grid" id="g"></div><div class="empty" id="e" hidden>မတွေ့ပါ။ တခြားနံပါတ်နဲ့ ရှာကြည့်ပါ။</div>
+</main>
+<div id="m" role="dialog" aria-modal="true"><div id="mb">
+<div class="top"><span id="mn"></span><button class="ib" id="x" aria-label="ပိတ်ရန်">✕</button></div>
+<img id="mi" alt="ထီပုံ">
+<div class="nav"><button class="ib" id="pv" aria-label="ရှေ့">‹</button><span id="pos"></span><button class="ib" id="cp">နံပါတ်ကူးမယ်</button><button class="ib" id="nx" aria-label="နောက်">›</button></div>
+</div></div>
+<script src="config.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let list=[],err='',view='num',digit='',cur=[],idx=0;
+function setImg(el,n){el.onerror=()=>{el.onerror=null;el.src='img/'+n+'.jpg'};el.src=n+'.jpg'}
+function filt(){const t=$('q').value.trim();return list.filter(n=>(!digit||n[0]===digit)&&(!t||n.includes(t)))}
+function draw(){
+ cur=filt();const g=$('g');g.innerHTML='';
+ g.style.gridTemplateColumns=view==='img'?'repeat(auto-fill,minmax(230px,1fr))':'';
+ cur.forEach((n,i)=>{const b=document.createElement('button');
+  if(view==='img'){b.className='g';const im=document.createElement('img');im.loading='lazy';im.alt='ထီ '+n;setImg(im,n);const s=document.createElement('span');s.textContent=n;b.append(im,s)}
+  else{b.className='t';b.innerHTML=n+'<small>၈၀ ဘတ်</small>'}
+  b.onclick=()=>open(i);g.appendChild(b)});
+ $('e').hidden=cur.length>0||!!err||!list.length;
+ const m=$('msg');m.className=err?'err':'';
+ m.textContent=err||(cur.length<list.length?'ရှာတွေ့တာ '+cur.length+' ရွက်':'ရောင်းမကုန်သေးတဲ့ ထီ '+list.length+' ရွက်');
+ $('left').innerHTML='ကျန် <b>'+list.length+'</b> ရွက်';
+}
+function open(i){idx=i;show();$('m').classList.add('on')}
+function show(){const n=cur[idx];if(!n)return;$('mn').textContent=n;setImg($('mi'),n);$('pos').textContent=(idx+1)+' / '+cur.length;$('cp').textContent='နံပါတ်ကူးမယ်'}
+function step(d){if(!cur.length)return;idx=(idx+d+cur.length)%cur.length;show()}
+function close(){$('m').classList.remove('on')}
+$('x').onclick=close;$('pv').onclick=()=>step(-1);$('nx').onclick=()=>step(1);
+$('m').onclick=e=>{if(e.target.id==='m')close()};
+$('cp').onclick=async()=>{try{await navigator.clipboard.writeText(cur[idx]);$('cp').textContent='ကူးပြီးပါပြီ'}catch(e){$('cp').textContent='ကူးမရပါ'}};
+document.addEventListener('keydown',e=>{if(!$('m').classList.contains('on'))return;if(e.key==='Escape')close();if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1)});
+let sx=0;$('mi').addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+$('mi').addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>50)step(d<0?1:-1)});
+$('q').oninput=draw;
+$('v1').onclick=()=>{view='num';$('v1').className='on';$('v2').className='';draw()};
+$('v2').onclick=()=>{view='img';$('v2').className='on';$('v1').className='';draw()};
+['အားလုံး',...'0123456789'].forEach((c,i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=c;
+ b.onclick=()=>{digit=i?c:'';[...$('chips').children].forEach(x=>x.classList.remove('on'));b.classList.add('on');draw()};$('chips').appendChild(b)});
+(function(){const left=Math.ceil((new Date('2026-11-01T00:00:00+07:00')-new Date())/864e5);
+ $('days').textContent=left>0?'ထီပွင့်ရန် '+left+' ရက်လိုသေး':left===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ'})();
+async function load(){
+ if(typeof API_URL==='undefined'||API_URL.indexOf('http')!==0){err='config.js ထဲမှာ API_URL မရှိသေးပါ။ Web App URL ထည့်ပါ။';draw();return}
+ try{const r=await fetch(API_URL);if(!r.ok)throw new Error('HTTP '+r.status);
+  const d=await r.json();if(!d||!Array.isArray(d.numbers))throw new Error('Sheet က မမျှော်လင့်တဲ့ အဖြေပြန်လာတယ်');
+  list=d.numbers.slice().sort();err=list.length?'':'Sheet ထဲမှာ ပြစရာနံပါတ် မရှိပါ';
+  try{localStorage.setItem('cache',JSON.stringify(list))}catch(e){}}
+ catch(e){err='ဖတ်မရပါ: '+e.message+' (Web App ကို Who has access: Anyone နဲ့ deploy လုပ်ထားလား စစ်ပါ)';
+  try{const c=JSON.parse(localStorage.getItem('cache')||'[]');if(c.length){list=c;err=''}}catch(x){}}
+ draw()}
+try{list=JSON.parse(localStorage.getItem('cache')||'[]');if(list.length)draw()}catch(e){}
+load();setInterval(load,60000);
+</script></body></html>
