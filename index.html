@@ -84,7 +84,7 @@ function draw(){
  g.style.gridTemplateColumns=view==='img'?'repeat(auto-fill,minmax(230px,1fr))':'';
  cur.forEach((n,i)=>{const b=document.createElement('button');
   if(view==='img'){b.className='g';const im=document.createElement('img');im.loading='lazy';im.alt='ထီ '+n;setImg(im,n);const s=document.createElement('span');s.textContent=n;b.append(im,s)}
-  else{b.className='t';b.innerHTML=n+'<small>၈၀ ဘတ်</small>'}
+  else{b.className='t';b.innerHTML=n+'<small></small>'}
   b.onclick=()=>open(i);g.appendChild(b)});
  $('e').hidden=cur.length>0||!!err||!list.length;
  const m=$('msg');m.className=err?'err':'';
