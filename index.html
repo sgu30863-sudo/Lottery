@@ -106,7 +106,7 @@ $('v1').onclick=()=>{view='num';$('v1').className='on';$('v2').className='';draw
 $('v2').onclick=()=>{view='img';$('v2').className='on';$('v1').className='';draw()};
 ['အားလုံး',...'0123456789'].forEach((c,i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=c;
  b.onclick=()=>{digit=i?c:'';[...$('chips').children].forEach(x=>x.classList.remove('on'));b.classList.add('on');draw()};$('chips').appendChild(b)});
-(function(){const left=Math.ceil((new Date('2026-11-01T00:00:00+07:00')-new Date())/864e5);
+(function(){const left=Math.ceil((new Date('2026-11-16T00:00:00+07:00')-new Date())/864e5);
  $('days').textContent=left>0?'ထီပွင့်ရန် '+left+' ရက်လိုသေး':left===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ'})();
 async function load(){
  if(typeof API_URL==='undefined'||API_URL.indexOf('http')!==0){err='config.js ထဲမှာ API_URL မရှိသေးပါ။ Web App URL ထည့်ပါ။';draw();return}
