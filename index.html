@@ -54,6 +54,7 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-o
 #cp{font-size:16px;background:var(--pink);font-weight:600}
 #pos{color:#e8d3de;font-size:14px;text-align:center;flex:1}
 
+#md{color:#ffe66b;font-weight:700;text-align:center;margin:10px 0 0;min-height:1px}
 .tabs{display:flex;gap:8px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tabs[hidden]{display:none}
@@ -77,7 +78,7 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-o
 </main>
 <div id="m" role="dialog" aria-modal="true"><div id="mb">
 <div class="top"><span id="mn"></span><button class="ib" id="x" aria-label="ပိတ်ရန်">✕</button></div>
-<img id="mi" alt="ထီပုံ">
+<img id="mi" alt="ထီပုံ"><div id="md"></div>
 <div class="nav"><button class="ib" id="pv" aria-label="ရှေ့">‹</button><span id="pos"></span><button class="ib" id="cp">နံပါတ်ကူးမယ်</button><button class="ib" id="nx" aria-label="နောက်">›</button></div>
 </div></div>
 <script src="config.js"></script>
@@ -88,12 +89,16 @@ let sheets=[],tab=-1,list=[],err='',view='num',digit='',cur=[],idx=0;
 function setImg(el,n){el.onerror=()=>{el.onerror=null;el.src='img/'+n+'.jpg'};el.src=n+'.jpg'}
 function sheetNums(i){if(i<0){const s=new Set();sheets.forEach(x=>x.numbers.forEach(n=>s.add(n)));return[...s].sort()}return(sheets[i]?sheets[i].numbers:[]).slice().sort()}
 function parseDate(t){const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(t||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null}
-function header(){const sh=tab>=0?sheets[tab]:null,d=sh&&parseDate(sh.draw);
- $('draw').textContent=d?'ထီပွင့်မယ့်ရက် '+d.getDate()+' '+MM[d.getMonth()]+' '+d.getFullYear():(sh&&sh.draw?'ထီပွင့်မယ့်ရက် '+sh.draw:'');
- $('draw').hidden=!$('draw').textContent;
- if(d){const left=Math.ceil((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date())/864e5);
-  $('days').textContent=left>0?'ထီပွင့်ရန် '+left+' ရက်လိုသေး':left===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ';$('days').hidden=false}
- else $('days').hidden=true}
+function fmtD(d){return d.getDate()+' '+MM[d.getMonth()]+' '+d.getFullYear()}
+function today0(){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
+function drawDates(){const seen=new Set(),out=[];sheets.forEach(sh=>{const d=parseDate(sh.draw);if(d&&!seen.has(+d)){seen.add(+d);out.push(d)}});return out.sort((x,y)=>x-y)}
+function header(){const ds=drawDates(),t=today0(),up=ds.filter(d=>d>=t);
+ if(!ds.length){$('draw').hidden=true;$('days').hidden=true;return}
+ $('draw').hidden=false;
+ $('draw').textContent=(up.length?'ထီပွင့်မယ့်ရက် ':'နောက်ဆုံးထီပွင့်ရက် ')+(up.length?up:ds.slice(-1)).map(fmtD).join(' / ');
+ const dd=up.length?Math.round((up[0]-t)/864e5):-1;
+ $('days').hidden=false;$('days').textContent=dd>0?'ထီပွင့်ရန် '+dd+' ရက်လိုသေး':dd===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ'}
+function drawOf(n){for(const sh of sheets)if(sh.numbers.includes(n)){const d=parseDate(sh.draw);if(d)return fmtD(d)}return ''}
 function drawTabs(){const t=$('tabs');t.innerHTML='';t.hidden=true;
  const mk=(label,i)=>{const b=document.createElement('button');b.className='tab'+(tab===i?' on':'');
   b.innerHTML='';b.append(label);const s=document.createElement('small');s.textContent=sheetNums(i).length;b.appendChild(s);
@@ -113,7 +118,7 @@ function draw(){
  $('left').innerHTML='ကျန် <b>'+list.length+'</b> ရွက်';
 }
 function open(i){idx=i;show();$('m').classList.add('on')}
-function show(){const n=cur[idx];if(!n)return;$('mn').textContent=n;setImg($('mi'),n);$('pos').textContent=(idx+1)+' / '+cur.length;$('cp').textContent='နံပါတ်ကူးမယ်'}
+function show(){const n=cur[idx];if(!n)return;$('mn').textContent=n;setImg($('mi'),n);$('pos').textContent=(idx+1)+' / '+cur.length;{const d=drawOf(n);$('md').textContent=d?'ထီပွင့်ရက် '+d:''}$('cp').textContent='နံပါတ်ကူးမယ်'}
 function step(d){if(!cur.length)return;idx=(idx+d+cur.length)%cur.length;show()}
 function close(){$('m').classList.remove('on')}
 $('x').onclick=close;$('pv').onclick=()=>step(-1);$('nx').onclick=()=>step(1);
@@ -132,7 +137,7 @@ function apply(d){
  if(!sh)throw new Error('Sheet က မမျှော်လင့်တဲ့ အဖြေပြန်လာတယ်');
  const keep=sheets[tab]&&sheets[tab].name;
  sheets=sh;const k=sheets.findIndex(s=>s.name===keep);if(tab>=0)tab=k>=0?k:0;if(tab>=sheets.length)tab=0;
- err=sheets.some(s=>s.numbers.length)?'':'Sheet ထဲမှာ ပြစရာနံပါတ် မရှိပါ';drawTabs();draw()}
+ err=sheets.some(s=>s.numbers.length)?'':'ထီကုန်ပါပြီ';drawTabs();draw()}
 async function load(){
  if(typeof API_URL==='undefined'||API_URL.indexOf('http')!==0){err='config.js ထဲမှာ API_URL မရှိသေးပါ။ Web App URL ထည့်ပါ။';draw();return}
  try{const r=await fetch(API_URL);if(!r.ok)throw new Error('HTTP '+r.status);
