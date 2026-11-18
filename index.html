@@ -31,10 +31,9 @@ main{max-width:860px;margin:0 auto;padding:16px}
 #msg{font-size:14px;color:var(--mut);margin:4px 2px 12px;min-height:21px}
 #msg.err{color:#c62828;font-weight:600}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
-.t{position:relative;border:0;cursor:pointer;background:var(--band);color:var(--bandink);padding:14px 10px 10px;border-radius:10px;text-align:center;font:800 21px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-indent:.12em;box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.t{position:relative;border:0;cursor:pointer;background:var(--band);color:var(--bandink);padding:16px 10px;border-radius:10px;text-align:center;font:800 21px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-indent:.12em;box-shadow:0 1px 0 rgba(0,0,0,.12)}
 .t::before,.t::after{content:"";position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--paper);transform:translateY(-50%)}
 .t::before{left:-6px}.t::after{right:-6px}
-.t small{display:block;font:600 11px system-ui;letter-spacing:0;text-indent:0;opacity:.6;margin-top:2px}
 .t:active{transform:scale(.97)}
 .g{padding:0;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;color:var(--ink);text-align:center}
 .g img{display:block;width:100%;aspect-ratio:1.82;object-fit:cover;background:#f3d9e5}
@@ -54,13 +53,20 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-o
 .nav .ib{font-size:26px}
 #cp{font-size:16px;background:var(--pink);font-weight:600}
 #pos{color:#e8d3de;font-size:14px;text-align:center;flex:1}
+
+.tabs{display:flex;gap:8px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:9px 16px;border-radius:12px;font:700 15px system-ui,"Noto Sans Myanmar",sans-serif;cursor:pointer}
+.tab small{font-weight:600;color:var(--mut);margin-left:6px}
+.tab.on{background:var(--pink);border-color:var(--pink);color:#fff}.tab.on small{color:#ffe3f0}
 </style></head><body>
 <header><div class="hd">
 <h1>ထီနံပါတ်များ</h1>
-<p class="draw">ထီပွင့်မယ့်ရက် ၁၆ နိုဝင်ဘာ ၂၀၂၆</p>
+<p class="draw" id="draw"></p>
 <div class="pills"><span class="pill" id="days"></span><span class="pill" id="left"></span></div>
 </div></header>
 <main>
+<div class="tabs" id="tabs" hidden></div>
 <div class="sw"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
 <input id="q" inputmode="numeric" placeholder="နံပါတ်ရှာပါ (ဥပမာ 0138)" aria-label="နံပါတ်ရှာရန်"></div>
 <div class="row"><div class="chips" id="chips" aria-label="ရှေ့ဂဏန်းနဲ့ စစ်ရန်"></div>
@@ -76,11 +82,25 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-o
 <script src="config.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-let list=[],err='',view='num',digit='',cur=[],idx=0;
+const MM=['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','ဩဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
+let sheets=[],tab=0,list=[],err='',view='num',digit='',cur=[],idx=0;
 function setImg(el,n){el.onerror=()=>{el.onerror=null;el.src='img/'+n+'.jpg'};el.src=n+'.jpg'}
+function sheetNums(i){if(i<0){const s=new Set();sheets.forEach(x=>x.numbers.forEach(n=>s.add(n)));return[...s].sort()}return(sheets[i]?sheets[i].numbers:[]).slice().sort()}
+function parseDate(t){const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(t||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null}
+function header(){const sh=tab>=0?sheets[tab]:null,d=sh&&parseDate(sh.draw);
+ $('draw').textContent=d?'ထီပွင့်မယ့်ရက် '+d.getDate()+' '+MM[d.getMonth()]+' '+d.getFullYear():(sh&&sh.draw?'ထီပွင့်မယ့်ရက် '+sh.draw:'');
+ $('draw').hidden=!$('draw').textContent;
+ if(d){const left=Math.ceil((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date())/864e5);
+  $('days').textContent=left>0?'ထီပွင့်ရန် '+left+' ရက်လိုသေး':left===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ';$('days').hidden=false}
+ else $('days').hidden=true}
+function drawTabs(){const t=$('tabs');t.innerHTML='';t.hidden=sheets.length<2;
+ const mk=(label,i)=>{const b=document.createElement('button');b.className='tab'+(tab===i?' on':'');
+  b.innerHTML='';b.append(label);const s=document.createElement('small');s.textContent=sheetNums(i).length;b.appendChild(s);
+  b.onclick=()=>{tab=i;digit='';[...$('chips').children].forEach((x,k)=>x.classList.toggle('on',k===0));drawTabs();draw()};t.appendChild(b)};
+ sheets.forEach((s,i)=>mk(s.name,i));if(sheets.length>1)mk('အားလုံး',-1)}
 function filt(){const t=$('q').value.trim();return list.filter(n=>(!digit||n[0]===digit)&&(!t||n.includes(t)))}
 function draw(){
- cur=filt();const g=$('g');g.innerHTML='';
+ list=sheetNums(tab);header();cur=filt();const g=$('g');g.innerHTML='';
  g.style.gridTemplateColumns=view==='img'?'repeat(auto-fill,minmax(230px,1fr))':'';
  cur.forEach((n,i)=>{const b=document.createElement('button');
   if(view==='img'){b.className='g';const im=document.createElement('img');im.loading='lazy';im.alt='ထီ '+n;setImg(im,n);const s=document.createElement('span');s.textContent=n;b.append(im,s)}
@@ -106,17 +126,20 @@ $('v1').onclick=()=>{view='num';$('v1').className='on';$('v2').className='';draw
 $('v2').onclick=()=>{view='img';$('v2').className='on';$('v1').className='';draw()};
 ['အားလုံး',...'0123456789'].forEach((c,i)=>{const b=document.createElement('button');b.className='chip'+(i?'':' on');b.textContent=c;
  b.onclick=()=>{digit=i?c:'';[...$('chips').children].forEach(x=>x.classList.remove('on'));b.classList.add('on');draw()};$('chips').appendChild(b)});
-(function(){const left=Math.ceil((new Date('2026-11-16T00:00:00+07:00')-new Date())/864e5);
- $('days').textContent=left>0?'ထီပွင့်ရန် '+left+' ရက်လိုသေး':left===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ'})();
+function apply(d){
+ let sh=Array.isArray(d.sheets)?d.sheets:(Array.isArray(d.numbers)?[{name:'ထီ',numbers:d.numbers}]:null);
+ if(!sh)throw new Error('Sheet က မမျှော်လင့်တဲ့ အဖြေပြန်လာတယ်');
+ const keep=sheets[tab]&&sheets[tab].name;
+ sheets=sh;const k=sheets.findIndex(s=>s.name===keep);if(tab>=0)tab=k>=0?k:0;if(tab>=sheets.length)tab=0;
+ err=sheets.some(s=>s.numbers.length)?'':'Sheet ထဲမှာ ပြစရာနံပါတ် မရှိပါ';drawTabs();draw()}
 async function load(){
  if(typeof API_URL==='undefined'||API_URL.indexOf('http')!==0){err='config.js ထဲမှာ API_URL မရှိသေးပါ။ Web App URL ထည့်ပါ။';draw();return}
  try{const r=await fetch(API_URL);if(!r.ok)throw new Error('HTTP '+r.status);
-  const d=await r.json();if(!d||!Array.isArray(d.numbers))throw new Error('Sheet က မမျှော်လင့်တဲ့ အဖြေပြန်လာတယ်');
-  list=d.numbers.slice().sort();err=list.length?'':'Sheet ထဲမှာ ပြစရာနံပါတ် မရှိပါ';
-  try{localStorage.setItem('cache',JSON.stringify(list))}catch(e){}}
+  const d=await r.json();apply(d);
+  try{localStorage.setItem('cache2',JSON.stringify(d))}catch(e){}}
  catch(e){err='ဖတ်မရပါ: '+e.message+' (Web App ကို Who has access: Anyone နဲ့ deploy လုပ်ထားလား စစ်ပါ)';
-  try{const c=JSON.parse(localStorage.getItem('cache')||'[]');if(c.length){list=c;err=''}}catch(x){}}
- draw()}
-try{list=JSON.parse(localStorage.getItem('cache')||'[]');if(list.length)draw()}catch(e){}
+  try{const c=JSON.parse(localStorage.getItem('cache2')||'null');if(c){apply(c);err=''}}catch(x){}
+  draw()}}
+try{const c=JSON.parse(localStorage.getItem('cache2')||'null');if(c)apply(c)}catch(e){}
 load();setInterval(load,60000);
 </script></body></html>
