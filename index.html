@@ -56,6 +56,7 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-o
 
 .tabs{display:flex;gap:8px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
+.tabs[hidden]{display:none}
 .tab{flex:none;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:9px 16px;border-radius:12px;font:700 15px system-ui,"Noto Sans Myanmar",sans-serif;cursor:pointer}
 .tab small{font-weight:600;color:var(--mut);margin-left:6px}
 .tab.on{background:var(--pink);border-color:var(--pink);color:#fff}.tab.on small{color:#ffe3f0}
@@ -83,7 +84,7 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--pink);outline-o
 <script>
 const $=id=>document.getElementById(id);
 const MM=['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','ဩဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
-let sheets=[],tab=0,list=[],err='',view='num',digit='',cur=[],idx=0;
+let sheets=[],tab=-1,list=[],err='',view='num',digit='',cur=[],idx=0;
 function setImg(el,n){el.onerror=()=>{el.onerror=null;el.src='img/'+n+'.jpg'};el.src=n+'.jpg'}
 function sheetNums(i){if(i<0){const s=new Set();sheets.forEach(x=>x.numbers.forEach(n=>s.add(n)));return[...s].sort()}return(sheets[i]?sheets[i].numbers:[]).slice().sort()}
 function parseDate(t){const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(t||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null}
@@ -93,7 +94,7 @@ function header(){const sh=tab>=0?sheets[tab]:null,d=sh&&parseDate(sh.draw);
  if(d){const left=Math.ceil((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date())/864e5);
   $('days').textContent=left>0?'ထီပွင့်ရန် '+left+' ရက်လိုသေး':left===0?'ဒီနေ့ ထီပွင့်ရက်':'ထီပွင့်ပြီးပါပြီ';$('days').hidden=false}
  else $('days').hidden=true}
-function drawTabs(){const t=$('tabs');t.innerHTML='';t.hidden=sheets.length<2;
+function drawTabs(){const t=$('tabs');t.innerHTML='';t.hidden=true;
  const mk=(label,i)=>{const b=document.createElement('button');b.className='tab'+(tab===i?' on':'');
   b.innerHTML='';b.append(label);const s=document.createElement('small');s.textContent=sheetNums(i).length;b.appendChild(s);
   b.onclick=()=>{tab=i;digit='';[...$('chips').children].forEach((x,k)=>x.classList.toggle('on',k===0));drawTabs();draw()};t.appendChild(b)};
